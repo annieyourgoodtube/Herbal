@@ -1,13 +1,377 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>中藥飲片驗收查詢系統 - V6</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="./src/main.tsx"></script>
-  </body>
-</html>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>中藥飲片圖片性狀查詢系統｜台中慈濟醫院藥學部</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --brown:#7A5230;
+  --gold:#C4956A;
+  --pale:#F5EFE8;
+  --bg:#F7F4EF;
+  --border:#E8DDD2;
+  --text:#1A1410;
+  --gray:#A8957F;
+}
+html,body{
+  height:100dvh;width:100%;
+  font-family:'Noto Serif TC',serif;
+  background:var(--bg);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+}
 
+/* HEADER */
+.header{
+  background:#1A1410;
+  padding:0.55rem 1rem 0.45rem;
+  text-align:center;
+  flex-shrink:0;
+}
+.hosp{font-size:11px;letter-spacing:0.22em;color:rgba(255,255,255,0.5);margin-bottom:2px;}
+.title{font-size:clamp(18px,6.2vw,36px);font-weight:700;color:#fff;letter-spacing:0.04em;width:100%;text-align:center;white-space:nowrap;}
+
+/* SEARCH */
+.search-wrap{
+  background:#fff;
+  padding:0.55rem 0.8rem 0.4rem;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.search-box{
+  display:flex;align-items:center;
+  border:1.5px solid var(--border);
+  border-radius:50px;
+  padding:0 14px;
+  background:#fff;
+  transition:border-color 0.2s;
+}
+.search-box:focus-within{border-color:var(--brown);}
+.s-icon{color:var(--gray);font-size:15px;margin-right:8px;flex-shrink:0;}
+.s-input{
+  flex:1;height:40px;
+  font-family:'Noto Serif TC',serif;
+  font-size:15px;color:var(--text);
+  border:none;outline:none;background:transparent;
+}
+.s-input::placeholder{color:var(--gray);}
+.s-clear{font-size:20px;color:var(--gray);cursor:pointer;display:none;padding:0 2px;}
+
+/* CARD LIST - 填滿剩餘空間 */
+.card-list{
+  flex:1;
+  display:flex;flex-direction:column;
+  padding:0.5rem 0.7rem;
+  gap:0.5rem;
+  overflow:hidden;
+}
+
+/* 每張卡片平分高度 */
+.herb-card{
+  flex:1;
+  background:#fff;
+  border-radius:14px;
+  border:1px solid var(--border);
+  display:flex;
+  align-items:stretch;
+  overflow:hidden;
+  cursor:pointer;
+  transition:border-color 0.15s,box-shadow 0.15s;
+}
+.herb-card:active{border-color:var(--gold);box-shadow:0 2px 12px rgba(122,82,48,0.15);}
+
+/* 圖片區 - 左側固定寬度 */
+.c-img{
+  width:32%;
+  flex-shrink:0;
+  background:var(--pale);
+  overflow:hidden;
+  position:relative;
+}
+.c-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.c-img-none{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--gray);letter-spacing:0.08em;
+}
+
+/* 資訊區 */
+.c-info{
+  flex:1;
+  display:flex;flex-direction:column;
+  justify-content:center;
+  padding:0.8rem 0.8rem 0.8rem 1rem;
+  gap:6px;
+}
+.c-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.c-loc{
+  font-size:clamp(18px,5vw,30px);
+  font-weight:700;color:#fff;
+  background:#1A1410;
+  padding:3px 13px;border-radius:7px;
+  letter-spacing:0.05em;line-height:1.3;
+  flex-shrink:0;
+}
+.c-name{
+  font-size:clamp(18px,5vw,30px);
+  font-weight:700;color:var(--text);
+  letter-spacing:0.04em;line-height:1.3;
+}
+.c-code{
+  font-size:clamp(11px,3vw,14px);
+  color:var(--gray);letter-spacing:0.08em;
+}
+.c-arrow{
+  margin-left:auto;
+  font-size:20px;color:var(--border);
+  padding-right:0.5rem;
+  flex-shrink:0;
+  align-self:center;
+}
+
+/* FOOTER */
+footer{
+  background:#fff;
+  border-top:1px solid var(--border);
+  padding:0.4rem 0.8rem 0.5rem;
+  text-align:center;
+  font-size:10px;color:var(--gray);
+  letter-spacing:0.1em;line-height:1.7;
+  flex-shrink:0;
+}
+.f-deco{display:flex;align-items:center;gap:6px;justify-content:center;margin:2px 0;}
+.f-deco span{height:1px;width:20px;background:var(--gold);opacity:0.5;}
+.f-deco i{font-style:normal;color:var(--gold);font-size:7px;}
+
+/* DETAIL OVERLAY */
+.overlay{
+  position:fixed;inset:0;
+  background:rgba(15,10,6,0.65);
+  z-index:200;
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.22s;
+}
+.overlay.show{opacity:1;pointer-events:all;}
+.d-card{
+  background:#fff;
+  border-radius:20px 20px 0 0;
+  width:100%;max-width:700px;
+  height:92dvh;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 -8px 40px rgba(0,0,0,0.25);
+  transform:translateY(100%);
+  transition:transform 0.28s cubic-bezier(.32,.72,0,1);
+}
+.overlay.show .d-card{transform:translateY(0);}
+
+/* Detail header */
+.d-hero{
+  background:linear-gradient(150deg,#1A1410,#3A2810);
+  padding:1.3rem 1.2rem 1.1rem;
+  flex-shrink:0;
+  position:relative;
+}
+.d-close{
+  position:absolute;top:0.8rem;right:0.9rem;
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(255,255,255,0.12);border:none;
+  font-size:18px;cursor:pointer;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+}
+.d-loc{font-size:clamp(36px,10vw,52px);font-weight:700;color:var(--gold);letter-spacing:0.05em;line-height:1;}
+.d-name{font-size:clamp(24px,7vw,36px);font-weight:700;color:#fff;letter-spacing:0.04em;margin-top:4px;}
+.d-code{font-size:clamp(13px,3.5vw,16px);color:rgba(255,255,255,0.45);letter-spacing:0.1em;margin-top:6px;}
+
+/* Detail body - 兩張圖片填滿 */
+.d-body{
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  padding:10px;
+  overflow:hidden;
+}
+.d-img-block{
+  display:flex;flex-direction:column;
+  gap:5px;
+  min-height:0;
+}
+.d-img-label{
+  font-size:11px;letter-spacing:0.15em;
+  color:var(--gray);text-align:center;
+  flex-shrink:0;
+}
+.d-img-wrap{
+  flex:1;
+  border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;
+  background:var(--pale);
+  display:flex;align-items:center;justify-content:center;
+  cursor:zoom-in;
+  min-height:0;
+}
+.d-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.d-img-none{font-size:30px;color:var(--border);}
+
+/* LIGHTBOX */
+.lightbox{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.94);
+  z-index:400;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.2s;
+  cursor:zoom-out;
+}
+.lightbox.show{opacity:1;pointer-events:all;}
+.lightbox img{max-width:98vw;max-height:96dvh;object-fit:contain;border-radius:6px;}
+.lb-x{position:absolute;top:0.8rem;right:0.9rem;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;font-size:20px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+.no-result{text-align:center;font-size:15px;color:var(--gray);padding:2rem;letter-spacing:0.1em;flex:1;display:flex;align-items:center;justify-content:center;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="hosp">台中慈濟醫院　藥學部</div>
+  <div class="title">中藥飲片　圖片性狀查詢系統</div>
+</div>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <div class="s-icon">🔍</div>
+    <input class="s-input" type="text" id="q" placeholder="搜尋品名或儲位…" oninput="onInput()" autocomplete="off"/>
+    <div class="s-clear" id="clr" onclick="clearSearch()">×</div>
+  </div>
+</div>
+
+<div class="card-list" id="card-list">
+  <div class="no-result" id="init-msg">資料庫載入中…</div>
+</div>
+
+<!-- DETAIL -->
+<div class="overlay" id="overlay" onclick="closeDetail(event)">
+  <div class="d-card">
+    <div class="d-hero" id="d-hero"></div>
+    <div class="d-body" id="d-body"></div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lb" onclick="closeLb()">
+  <button class="lb-x" onclick="closeLb()">×</button>
+  <img id="lb-img" src="" alt=""/>
+</div>
+
+<footer>
+  <div class="f-deco"><span></span><i>◆</i><span></span></div>
+  資料來源：《臺灣中藥典第四版》、香港浸會大學「中藥材圖像數據庫」<br>
+  <span style="font-size:13px;color:var(--text2);letter-spacing:0.1em;">指導：陳綺華 部主任・李雅蓁 主任</span><br>
+  <span style="font-size:12px;color:var(--text2);letter-spacing:0.1em;">製作：許文馨</span>　<span style="font-size:11px;color:var(--gray);letter-spacing:0.08em;">協力：施瑢家・李家豪・李紀賢</span><br>
+  <span style="color:var(--gold);">合心協力・精進專業　© 2026.04 All Rights Reserved</span>
+</footer>
+
+<script>
+const CSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vQ739lXTSSaf8ld36I05HAAYx6_yuCViApPyZLyqL7xw_qotv6_7rlzaBV43gmHTcvsox0QjjwTwrdH/pub?output=csv';
+const DI=id=>'https://lh3.googleusercontent.com/d/'+id.trim();
+function splitLine(l){const c=[];let s='',q=false;for(const x of l){if(x==='"'){q=!q;}else if(x===','&&!q){c.push(s.trim());s='';}else s+=x;}c.push(s.trim());return c;}
+function parseCSV(t){const ls=t.replace(/\r/g,'').split('\n');const h=splitLine(ls[0]).map(x=>x.replace(/"/g,''));return ls.slice(1).filter(l=>l.trim()).map(l=>{const c=splitLine(l);const o={};h.forEach((k,i)=>o[k]=(c[i]||'').replace(/"/g,'').trim());return o;});}
+function fv(r,ks){const keys=Object.keys(r);for(const k of ks){const f=keys.find(x=>x.replace(/\s/g,'').includes(k));if(f&&r[f])return r[f];}return '';}
+let data=[],cur=[];
+
+function load(){
+  fetch(CSV)
+    .then(r=>r.text())
+    .then(text=>{
+      data=parseCSV(text).filter(r=>Object.values(r).some(v=>v));
+      cur=data.slice(0,3);
+      render(cur);
+    })
+    .catch(e=>{document.getElementById('init-msg').textContent='資料庫載入失敗，請確認網路連線';console.error(e);});
+}
+
+function onInput(){
+  const q=document.getElementById('q').value.trim();
+  document.getElementById('clr').style.display=q?'block':'none';
+  if(!q){cur=data.slice(0,3);render(cur);return;}
+  cur=data.filter(r=>Object.values(r).some(v=>v&&v.toString().toLowerCase().includes(q.toLowerCase()))).slice(0,3);
+  render(cur);
+}
+
+function clearSearch(){
+  document.getElementById('q').value='';
+  document.getElementById('clr').style.display='none';
+  cur=data.slice(0,3);render(cur);
+}
+
+function render(list){
+  const el=document.getElementById('card-list');
+  if(!list.length){el.innerHTML='<div class="no-result">查無符合資料</div>';return;}
+  el.innerHTML=list.map((r,i)=>{
+    const loc=fv(r,['儲位']);
+    const name=fv(r,['品名','名稱','藥材']);
+    const code=fv(r,['料號','編號']);
+    const img1=fv(r,['外觀圖片ID','外觀ID']);
+    const img=img1&&img1.length>10
+      ?`<img src="${DI(img1)}" alt="${name}" onerror="this.parentNode.innerHTML='<div class=\\'c-img-none\\'>🌿</div>'" />`
+      :`<div class="c-img-none">🌿</div>`;
+    return `<div class="herb-card" onclick="showDetail(${i})">
+      <div class="c-img">${img}</div>
+      <div class="c-info">
+        <div class="c-top">
+          <span class="c-loc">${loc||'—'}</span>
+          <span class="c-name">${name||'—'}</span>
+        </div>
+        <div class="c-code">${code?'料號　'+code:''}</div>
+      </div>
+      <div class="c-arrow">›</div>
+    </div>`;
+  }).join('');
+}
+
+function showDetail(i){
+  const r=cur[i];
+  const loc=fv(r,['儲位']);
+  const name=fv(r,['品名','名稱','藥材']);
+  const code=fv(r,['料號','編號']);
+  const img1=fv(r,['外觀圖片ID','外觀ID']);
+  const img2=fv(r,['性狀圖片ID','性狀ID']);
+
+  document.getElementById('d-hero').innerHTML=
+    `<button class="d-close" onclick="closeDetail()">×</button>
+    <div class="d-loc">${loc||'—'}</div>
+    <div class="d-name">${name||'—'}</div>
+    <div class="d-code">料號　${code||'—'}</div>`;
+
+  const imgB=(id,label)=>id&&id.length>10
+    ?`<div class="d-img-block">
+        <div class="d-img-label">${label}</div>
+        <div class="d-img-wrap" onclick="openLb('${DI(id)}')">
+          <img src="${DI(id)}" alt="${label}" onerror="this.parentNode.innerHTML='<div class=\\'d-img-none\\'>🌿</div>'"/>
+        </div>
+      </div>`
+    :`<div class="d-img-block">
+        <div class="d-img-label">${label}</div>
+        <div class="d-img-wrap"><div class="d-img-none">🌿</div></div>
+      </div>`;
+
+  document.getElementById('d-body').innerHTML=imgB(img1,'外　觀　圖　片')+imgB(img2,'性　狀　圖　片');
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeDetail(e){
+  if(e&&e.target!==document.getElementById('overlay'))return;
+  document.getElementById('overlay').classList.remove('show');
+}
+function openLb(src){document.getElementById('lb-img').src=src;document.getElementById('lb').classList.add('show');}
+function closeLb(){document.getElementById('lb').classList.remove('show');document.getElementById('lb-img').src='';}
+
+load();
+</script>
+</body>
+</html>
