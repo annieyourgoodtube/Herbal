@@ -6,7 +6,7 @@
 <title>中藥飲片圖片性狀查詢系統｜台中慈濟醫院藥學部</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
   --brown:#7A5230;
   --gold:#C4956A;
@@ -48,19 +48,33 @@ html,body{
   padding:0 14px;
   background:#fff;
   transition:border-color 0.2s;
+  height:44px;
 }
-.search-box:focus-within{border-color:var(--brown);}
+.search-box:focus-within{border-color:#1A1410;}
 .s-icon{color:var(--gray);font-size:15px;margin-right:8px;flex-shrink:0;}
 .s-input{
-  flex:1;height:40px;
+  flex:1;
   font-family:'Noto Serif TC',serif;
-  font-size:15px;color:var(--text);
+  font-size:16px;color:var(--text);
   border:none;outline:none;background:transparent;
 }
 .s-input::placeholder{color:var(--gray);}
-.s-clear{font-size:20px;color:var(--gray);cursor:pointer;display:none;padding:0 2px;}
+.s-clear{font-size:22px;color:var(--gray);cursor:pointer;display:none;padding:0 4px;line-height:1;}
+.check-btn{
+  display:block;
+  text-align:right;
+  margin-top:6px;
+}
+.check-btn button{
+  font-family:'Noto Serif TC',serif;
+  font-size:12px;color:#1A1410;
+  background:transparent;
+  border:1px solid #1A1410;
+  border-radius:20px;padding:3px 12px;
+  cursor:pointer;letter-spacing:0.06em;
+}
 
-/* CARD LIST - 填滿剩餘空間 */
+/* CARD LIST — 三張平分螢幕 */
 .card-list{
   flex:1;
   display:flex;flex-direction:column;
@@ -69,7 +83,6 @@ html,body{
   overflow:hidden;
 }
 
-/* 每張卡片平分高度 */
 .herb-card{
   flex:1;
   background:#fff;
@@ -80,16 +93,13 @@ html,body{
   overflow:hidden;
   cursor:pointer;
   transition:border-color 0.15s,box-shadow 0.15s;
+  min-height:0;
 }
 .herb-card:active{border-color:var(--gold);box-shadow:0 2px 12px rgba(122,82,48,0.15);}
 
-/* 圖片區 - 左側固定寬度 */
 .c-img{
-  width:32%;
-  flex-shrink:0;
-  background:var(--pale);
-  overflow:hidden;
-  position:relative;
+  width:32%;flex-shrink:0;
+  background:var(--pale);overflow:hidden;
 }
 .c-img img{width:100%;height:100%;object-fit:cover;display:block;}
 .c-img-none{
@@ -98,41 +108,30 @@ html,body{
   font-size:13px;color:var(--gray);letter-spacing:0.08em;
 }
 
-/* 資訊區 */
 .c-info{
-  flex:1;
-  display:flex;flex-direction:column;
+  flex:1;display:flex;flex-direction:column;
   justify-content:center;
   padding:0.8rem 0.8rem 0.8rem 1rem;
-  gap:6px;
+  gap:6px;min-width:0;
 }
 .c-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .c-loc{
-  font-size:clamp(18px,5vw,30px);
-  font-weight:700;color:#fff;
+  font-size:clamp(18px,5vw,30px);font-weight:700;color:#fff;
   background:#1A1410;
   padding:3px 13px;border-radius:7px;
-  letter-spacing:0.05em;line-height:1.3;
-  flex-shrink:0;
+  letter-spacing:0.05em;line-height:1.3;flex-shrink:0;
 }
 .c-name{
-  font-size:clamp(22px,6vw,34px);
-  font-weight:700;color:var(--text);
+  font-size:clamp(22px,6vw,34px);font-weight:700;color:var(--text);
   letter-spacing:0.04em;line-height:1.3;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.c-code{
-  font-size:clamp(13px,3.5vw,16px);
-  color:var(--gray);letter-spacing:0.08em;
-}
-.c-arrow{
-  margin-left:auto;
-  font-size:20px;color:var(--border);
-  padding-right:0.5rem;
-  flex-shrink:0;
-  align-self:center;
-}
+.c-code{font-size:clamp(13px,3.5vw,16px);color:var(--gray);letter-spacing:0.08em;}
+.c-arrow{margin-left:auto;font-size:20px;color:var(--border);padding-right:0.5rem;flex-shrink:0;align-self:center;}
 
-/* FOOTER */
+.no-result{text-align:center;font-size:15px;color:var(--gray);padding:2rem;letter-spacing:0.1em;flex:1;display:flex;align-items:center;justify-content:center;}
+
+/* FOOTER — 舊版置中 */
 footer{
   background:#fff;
   border-top:1px solid var(--border);
@@ -168,17 +167,16 @@ footer{
   transition:transform 0.28s cubic-bezier(.32,.72,0,1);
 }
 .overlay.show .d-card{transform:translateY(0);}
+.d-handle{width:36px;height:4px;background:rgba(0,0,0,0.12);border-radius:2px;margin:10px auto 0;flex-shrink:0;}
 
-/* Detail header */
 .d-hero{
   background:linear-gradient(150deg,#1A1410,#3A2810);
   padding:1.3rem 1.2rem 1.1rem;
-  flex-shrink:0;
-  position:relative;
+  flex-shrink:0;position:relative;
 }
 .d-close{
   position:absolute;top:0.8rem;right:0.9rem;
-  width:34px;height:34px;border-radius:50%;
+  width:40px;height:40px;border-radius:50%;
   background:rgba(255,255,255,0.12);border:none;
   font-size:18px;cursor:pointer;color:#fff;
   display:flex;align-items:center;justify-content:center;
@@ -187,52 +185,43 @@ footer{
 .d-name{font-size:clamp(24px,7vw,36px);font-weight:700;color:#fff;letter-spacing:0.04em;margin-top:4px;}
 .d-code{font-size:clamp(13px,3.5vw,16px);color:rgba(255,255,255,0.45);letter-spacing:0.1em;margin-top:6px;}
 
-/* Detail body - 兩張圖片填滿 */
 .d-body{
-  flex:1;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  padding:10px;
-  overflow:hidden;
+  flex:1;display:grid;grid-template-columns:1fr 1fr;
+  gap:10px;padding:10px;overflow:hidden;
 }
-.d-img-block{
-  display:flex;flex-direction:column;
-  gap:5px;
-  min-height:0;
-}
-.d-img-label{
-  font-size:11px;letter-spacing:0.15em;
-  color:var(--gray);text-align:center;
-  flex-shrink:0;
-}
+.d-img-block{display:flex;flex-direction:column;gap:5px;min-height:0;}
+.d-img-label{font-size:11px;letter-spacing:0.15em;color:var(--gray);text-align:center;flex-shrink:0;}
 .d-img-wrap{
-  flex:1;
-  border:1px solid var(--border);
-  border-radius:12px;overflow:hidden;
-  background:var(--pale);
+  flex:1;border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;background:var(--pale);
   display:flex;align-items:center;justify-content:center;
-  cursor:zoom-in;
-  min-height:0;
+  cursor:zoom-in;min-height:0;
 }
 .d-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
 .d-img-none{font-size:30px;color:var(--border);}
 
+/* 缺圖清單 */
+.miss-card{
+  background:#fff;border-radius:20px 20px 0 0;
+  width:100%;max-width:700px;
+  height:80dvh;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 -8px 40px rgba(0,0,0,0.25);
+  transform:translateY(100%);
+  transition:transform 0.28s cubic-bezier(.32,.72,0,1);
+}
+.overlay.show .miss-card{transform:translateY(0);}
+
 /* LIGHTBOX */
 .lightbox{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,0.94);
-  z-index:400;
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;
-  transition:opacity 0.2s;
-  cursor:zoom-out;
+  position:fixed;inset:0;background:rgba(0,0,0,0.94);
+  z-index:400;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 0.2s;cursor:zoom-out;
 }
 .lightbox.show{opacity:1;pointer-events:all;}
 .lightbox img{max-width:98vw;max-height:96dvh;object-fit:contain;border-radius:6px;}
-.lb-x{position:absolute;top:0.8rem;right:0.9rem;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;font-size:20px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-
-.no-result{text-align:center;font-size:15px;color:var(--gray);padding:2rem;letter-spacing:0.1em;flex:1;display:flex;align-items:center;justify-content:center;}
+.lb-x{position:absolute;top:0.8rem;right:0.9rem;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;font-size:20px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 </style>
 </head>
 <body>
@@ -245,8 +234,14 @@ footer{
 <div class="search-wrap">
   <div class="search-box">
     <div class="s-icon">🔍</div>
-    <input class="s-input" type="text" id="q" placeholder="搜尋品名或儲位…" oninput="onInput()" autocomplete="off"/>
+    <input class="s-input" type="text" id="q"
+      placeholder="搜尋品名或儲位…"
+      oninput="onInput()" autocomplete="off"
+      inputmode="search" enterkeyhint="search"/>
     <div class="s-clear" id="clr" onclick="clearSearch()">×</div>
+  </div>
+  <div class="check-btn">
+    <button onclick="showMissing()">⚠ 缺圖檢查</button>
   </div>
 </div>
 
@@ -257,8 +252,22 @@ footer{
 <!-- DETAIL -->
 <div class="overlay" id="overlay" onclick="closeDetail(event)">
   <div class="d-card">
+    <div class="d-handle"></div>
     <div class="d-hero" id="d-hero"></div>
     <div class="d-body" id="d-body"></div>
+  </div>
+</div>
+
+<!-- 缺圖清單 -->
+<div class="overlay" id="miss-overlay" onclick="closeMissing(event)">
+  <div class="miss-card">
+    <div class="d-handle"></div>
+    <div style="background:#1A1410;padding:14px 16px;flex-shrink:0;position:relative;">
+      <button class="d-close" onclick="closeMissing()">×</button>
+      <div style="font-size:20px;font-weight:700;color:var(--gold);letter-spacing:0.05em;">缺圖檢查</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:4px;" id="miss-summary"></div>
+    </div>
+    <div id="miss-body" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 12px;display:flex;flex-direction:column;gap:6px;"></div>
   </div>
 </div>
 
@@ -271,8 +280,8 @@ footer{
 <footer>
   <div class="f-deco"><span></span><i>◆</i><span></span></div>
   <div style="font-size:10px;color:var(--gray);margin-bottom:5px;">資料來源：《臺灣中藥典第四版》、香港浸會大學「中藥材圖像數據庫」</div>
-  <div style="font-size:15px;font-weight:700;color:var(--text2);letter-spacing:0.1em;margin-bottom:3px;">指導：陳綺華 部主任・李雅蓁 主任</div>
-  <div style="font-size:13px;font-weight:500;color:var(--text2);margin-bottom:3px;">製作：許文馨</div>
+  <div style="font-size:15px;font-weight:700;color:var(--text);letter-spacing:0.1em;margin-bottom:3px;">指導：陳綺華 部主任・李雅蓁 主任</div>
+  <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;">製作：許文馨</div>
   <div style="font-size:11px;color:var(--gray);margin-bottom:6px;">協力：施瑢家・李家豪・李紀賢</div>
   <div style="color:var(--gold);font-size:11px;letter-spacing:0.08em;">合心協力・精進專業</div>
   <div style="color:var(--gold);font-size:11px;letter-spacing:0.08em;">© 2026.04 All Rights Reserved</div>
@@ -281,9 +290,11 @@ footer{
 <script>
 const CSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vQ739lXTSSaf8ld36I05HAAYx6_yuCViApPyZLyqL7xw_qotv6_7rlzaBV43gmHTcvsox0QjjwTwrdH/pub?output=csv';
 const DI=id=>'https://lh3.googleusercontent.com/d/'+id.trim();
+
 function splitLine(l){const c=[];let s='',q=false;for(const x of l){if(x==='"'){q=!q;}else if(x===','&&!q){c.push(s.trim());s='';}else s+=x;}c.push(s.trim());return c;}
 function parseCSV(t){const ls=t.replace(/\r/g,'').split('\n');const h=splitLine(ls[0]).map(x=>x.replace(/"/g,''));return ls.slice(1).filter(l=>l.trim()).map(l=>{const c=splitLine(l);const o={};h.forEach((k,i)=>o[k]=(c[i]||'').replace(/"/g,'').trim());return o;});}
 function fv(r,ks){const keys=Object.keys(r);for(const k of ks){const f=keys.find(x=>x.replace(/\s/g,'').includes(k));if(f&&r[f])return r[f];}return '';}
+
 let data=[],cur=[];
 
 function load(){
@@ -320,7 +331,7 @@ function render(list){
     const code=fv(r,['料號','編號']);
     const img1=fv(r,['外觀圖片ID','外觀ID']);
     const img=img1&&img1.length>10
-      ?`<img src="${DI(img1)}" alt="${name}" onerror="this.parentNode.innerHTML='<div class=\\'c-img-none\\'>🌿</div>'" />`
+      ?`<img src="${DI(img1)}" alt="${name}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=\\'c-img-none\\'>🌿</div>'" />`
       :`<div class="c-img-none">🌿</div>`;
     return `<div class="herb-card" onclick="showDetail(${i})">
       <div class="c-img">${img}</div>
@@ -343,13 +354,11 @@ function showDetail(i){
   const code=fv(r,['料號','編號']);
   const img1=fv(r,['外觀圖片ID','外觀ID']);
   const img2=fv(r,['性狀圖片ID','性狀ID']);
-
   document.getElementById('d-hero').innerHTML=
     `<button class="d-close" onclick="closeDetail()">×</button>
     <div class="d-loc">${loc||'—'}</div>
     <div class="d-name">${name||'—'}</div>
     <div class="d-code">料號　${code||'—'}</div>`;
-
   const imgB=(id,label)=>id&&id.length>10
     ?`<div class="d-img-block">
         <div class="d-img-label">${label}</div>
@@ -361,7 +370,6 @@ function showDetail(i){
         <div class="d-img-label">${label}</div>
         <div class="d-img-wrap"><div class="d-img-none">🌿</div></div>
       </div>`;
-
   document.getElementById('d-body').innerHTML=imgB(img1,'外　觀　圖　片')+imgB(img2,'性　狀　圖　片');
   document.getElementById('overlay').classList.add('show');
 }
@@ -370,6 +378,42 @@ function closeDetail(e){
   if(e&&e.target!==document.getElementById('overlay'))return;
   document.getElementById('overlay').classList.remove('show');
 }
+
+function showMissing(){
+  const missing=data.filter(r=>{
+    const img1=fv(r,['外觀圖片ID','外觀ID']);
+    const img2=fv(r,['性狀圖片ID','性狀ID']);
+    return !img1||img1.length<=10||!img2||img2.length<=10;
+  });
+  document.getElementById('miss-summary').textContent=missing.length
+    ?`共 ${missing.length} 筆缺圖（資料庫共 ${data.length} 筆）`
+    :'所有藥材圖片均已填寫 ✓';
+  document.getElementById('miss-body').innerHTML=missing.length
+    ?missing.map(r=>{
+        const loc=fv(r,['儲位'])||'—';
+        const name=fv(r,['品名','名稱','藥材'])||'—';
+        const img1=fv(r,['外觀圖片ID','外觀ID']);
+        const img2=fv(r,['性狀圖片ID','性狀ID']);
+        const m1=!img1||img1.length<=10;
+        const m2=!img2||img2.length<=10;
+        return `<div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:13px;font-weight:700;color:#fff;background:#1A1410;padding:2px 9px;border-radius:5px;flex-shrink:0;">${loc}</span>
+          <span style="font-size:16px;font-weight:700;color:var(--text);flex:1;">${name}</span>
+          <span style="font-size:11px;line-height:2;text-align:right;flex-shrink:0;">
+            ${m1?'<span style="color:#c0392b;">外觀 ✗</span>':'<span style="color:#27ae60;">外觀 ✓</span>'}<br>
+            ${m2?'<span style="color:#c0392b;">性狀 ✗</span>':'<span style="color:#27ae60;">性狀 ✓</span>'}
+          </span>
+        </div>`;
+      }).join('')
+    :`<div style="text-align:center;padding:3rem 1rem;font-size:15px;color:var(--gray);">🎉 所有圖片均已填寫！</div>`;
+  document.getElementById('miss-overlay').classList.add('show');
+}
+
+function closeMissing(e){
+  if(e&&e.target!==document.getElementById('miss-overlay'))return;
+  document.getElementById('miss-overlay').classList.remove('show');
+}
+
 function openLb(src){document.getElementById('lb-img').src=src;document.getElementById('lb').classList.add('show');}
 function closeLb(){document.getElementById('lb').classList.remove('show');document.getElementById('lb-img').src='';}
 
