@@ -449,7 +449,7 @@ function syncImages(){
   btn.classList.add('loading');
   icon.classList.add('spinning');
   txt.textContent='更新中…';
-  const WEB_APP='https://script.google.com/macros/s/AKfycbycGlCiP6hEZAaIN9Ni0Kr-1CfGhUBuDcqZElpkTEh6mMSp3c6R9ipqVpHR05ZdSiz69A/exec?action=update';
+  const WEB_APP='https://script.google.com/macros/s/AKfycbzu6kqUxy2LVcbzWQiWMahMHAce14BZZ85mcJpIo8r9CJaoNoaAj95rVCM6DdINOnfsYQ/exec?action=update';
   fetch(WEB_APP)
     .then(r=>r.json())
     .then(d=>{
