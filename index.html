@@ -30,9 +30,26 @@ html,body{
   padding:0.55rem 1rem 0.45rem;
   text-align:center;
   flex-shrink:0;
+  position:relative;
 }
 .hosp{font-size:11px;letter-spacing:0.22em;color:rgba(255,255,255,0.5);margin-bottom:2px;}
 .title{font-size:clamp(18px,6.2vw,36px);font-weight:700;color:#fff;letter-spacing:0.04em;width:100%;text-align:center;white-space:nowrap;}
+.sync-btn{
+  position:absolute;top:50%;right:12px;transform:translateY(-50%);
+  background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);
+  color:#fff;border-radius:20px;
+  font-family:'Noto Serif TC',serif;
+  font-size:11px;letter-spacing:0.06em;
+  padding:5px 10px;cursor:pointer;
+  display:flex;align-items:center;gap:4px;
+  transition:background 0.15s;
+  white-space:nowrap;
+}
+.sync-btn:active{background:rgba(255,255,255,0.22);}
+.sync-btn.loading{opacity:0.6;pointer-events:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.sync-icon{display:inline-block;font-size:13px;}
+.sync-icon.spinning{animation:spin 0.8s linear infinite;}
 
 /* SEARCH */
 .search-wrap{
@@ -72,7 +89,13 @@ html,body{
   border:1px solid #1A1410;
   border-radius:20px;padding:3px 12px;
   cursor:pointer;letter-spacing:0.06em;
+  transition:background 0.15s,color 0.15s;
 }
+.check-btn button:active{background:#1A1410;color:#fff;}
+.check-btn button.loading{opacity:0.5;pointer-events:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+#sync-icon{display:inline-block;}
+#sync-icon.spinning{animation:spin 0.8s linear infinite;}
 
 /* CARD LIST — 三張平分螢幕 */
 .card-list{
@@ -241,7 +264,9 @@ footer{
     <div class="s-clear" id="clr" onclick="clearSearch()">×</div>
   </div>
   <div class="check-btn">
-    <button onclick="showMissing()">⚠ 缺圖檢查</button>
+    <button id="sync-btn" onclick="syncImages()">
+      <span id="sync-icon">↻</span> <span id="sync-text">更新資料</span>
+    </button>
   </div>
 </div>
 
@@ -416,6 +441,39 @@ function closeMissing(e){
 
 function openLb(src){document.getElementById('lb-img').src=src;document.getElementById('lb').classList.add('show');}
 function closeLb(){document.getElementById('lb').classList.remove('show');document.getElementById('lb-img').src='';}
+
+function syncImages(){
+  const btn=document.getElementById('sync-btn');
+  const icon=document.getElementById('sync-icon');
+  const txt=document.getElementById('sync-text');
+  btn.classList.add('loading');
+  icon.classList.add('spinning');
+  txt.textContent='更新中…';
+  const WEB_APP='https://script.google.com/macros/s/AKfycbycGlCiP6hEZAaIN9Ni0Kr-1CfGhUBuDcqZElpkTEh6mMSp3c6R9ipqVpHR05ZdSiz69A/exec?action=update';
+  fetch(WEB_APP)
+    .then(r=>r.json())
+    .then(d=>{
+      icon.classList.remove('spinning');
+      icon.textContent='✓';
+      txt.textContent='已更新 '+d.updated+' 筆';
+      setTimeout(()=>{
+        btn.classList.remove('loading');
+        icon.textContent='↻';
+        txt.textContent='更新資料';
+        load();
+      },2000);
+    })
+    .catch(()=>{
+      icon.classList.remove('spinning');
+      icon.textContent='!';
+      txt.textContent='更新失敗';
+      setTimeout(()=>{
+        btn.classList.remove('loading');
+        icon.textContent='↻';
+        txt.textContent='更新資料';
+      },2000);
+    });
+}
 
 load();
 </script>
